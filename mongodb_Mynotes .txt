@@ -1,0 +1,532 @@
+1. What is MonogoDB ?
+
+--> MongodDB is an open-source, document-oriented NoSQL database management systm.
+
+Designed for flexibility, scalability and performance in handling unstructured or semi-structured data.
+
+2. About MongoDB 
+
+--> It was created by a company called 10gen, which is now known as MongoDB,Inc.The company was founded by Eliot Horowitz and Merriman in 2007.
+    The first version of MongoDB was released in 2009.
+    The name of MongoDB is comming from the word "HUMONGOUS" means very large.
+
+3. SQL VS MongoDB
+_______________________________________________________________________________________________________________________________________________
+|   SQL                                                                 |                  MongoDB                                            | 
+|_______________________________________________________________________|_____________________________________________________________________|
+|                                                                       |                                                                     |
+|1. SQL database are relational database.                               | 1. NoSQL database are non-relational database.                      |
+|                                                                       |                                                                     |
+|2. They use structured tables to stores data in row and columns.       | 2. They provide flexibility in data storage, allowing vairied data  | 
+|                                                                       |    types and structures.                                            |
+|3. Suitable for application with well-defined schemas and fixed        | 3. Ideal for application with dynamic or evolving data models.      |
+|   data structures.                                                    |                                                                     |
+|                                                                       |                                                                     |
+|4. E-commerce platform, HR Management etc .                            | 4. CMS, Social Media platforms, Gamming.                            | 
+|                                                                       |                                                                     |
+|5. Example: MySQL, PostgreSQL, Oracle.                                 | 5. Example MongoDB , cassandra .                                    |
+|_______________________________________________________________________|_____________________________________________________________________|
+
+
+4. JSON Vs BSON
+
+--> In MongoDB , we write in JSON format only, but behind the scene data is stored in BSON (Binary format) , binary representation of JSON.
+
+5. How to see the database --> show dbs;
+   
+   use database --> use <databaseName>;
+  
+   create collection --> db.createCollection('collectionName')
+ 
+   show collections  --> show collections;
+  
+   see the data under collection --> db.collectionName.find();
+
+   delete collection --> db.collectionName.drop();
+  
+   delete database --> db.dropDatabase();
+
+6. Insert document in MongoDB 
+
+-->  db.<collectionName>.insertOne({
+
+            field : value1,
+            field : value2,
+             
+            ...
+    });
+
+
+--> insert many document
+
+    db.collectionName.insertMany([
+     {
+       field1 : value1,
+       filed2 : value2
+      },
+     {
+      field1 : value1,
+      field2 : value2
+     },
+    ])
+
+--> db.collectionName.insertMany([{"name" : "abc", "roll_no" : 13}, {"name" : "xyz", "roll_no" : 14}, {"name" : "pqr" , "roll_no" : 10}])
+
+7. Ordered and Unordered Insert
+
+--> when executing bulk write operation, "ordered" and "unordered" determine the batch behavior.
+
+I. Ordered Insert --> Default behavior is ordered, where MongoDB stops on the first error.
+   
+   db.collectionName.insertMany([{},{}]).
+
+II. Unordered Insert --> when executing bulk write operation with unordered flag, MongoDB 
+
+    processing after encountering an error. syntax--> db.collectionName.insertMany([{},{},{}],{ordered:false})
+
+8. Case Sensitivity in MongoDB
+   
+   collection names are case-sensitive.
+
+   field name within document also case sensitive.
+
+9. Finding document in mongodb
+
+--> I. find() 
+   
+    db.collectionName.find({key:value})
+
+   II. findOne()
+
+--> db.collectionName.findOne({key:value})
+
+10. importing JSON in MongoDB
+
+--> syntax --> mongoimport jsonfile.json -d databaseName -c collectionName
+  
+   mongoimport jsonfile.json -d databaseName -c collectionName --jsonArray
+
+  Here , --jsonArray accept the import data expressed with multiple document within single JSON array.
+
+11. comparision operator
+
+   equal --> $eq
+   not equal --> $ne
+   greater than --> $gt
+   greater than equal --> $gte
+   less than --> $lt
+   less than equal --> $lte
+  
+  syntax --> db.collectionName.find({'fieldName':{$opratorName:value}})
+
+ count() is used to show the counts of documents. --> ex. shop> db.products.find({price:{$gt:1000}}).count() --> ans 5
+
+
+ex -->  shop> db.products.find({price:{$gt:1000}})
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    name: 'Laptop Pro',
+    company: '64c23350e32f4a51b19b9231',
+    price: 1299,
+    colors: [ '#333333', '#cccccc', '#00ff00' ],
+    image: '/images/product-laptop.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: true
+  },
+]
+
+12 . Introduction to cursors
+
+--> Cursors in MongoDB are used to efficiently retrive large result sets from quries, providing control over the data retrieval process.
+
+ mongodb retrive query results in batches using cursors.
+ 
+cursors are a pointer to the result set on the server.
+
+Cursor Methods
+ 
+I. count() --> count is used to count the documents.
+
+II. limit() --> limit is used to show document is given limit ex--> db.collectionName.find().limit(2)
+
+III. skip() --> skip is used to skip the documents
+
+Iv. sort() --> syntax --> db.collectionName.find({field:{$op:value}}).sort({field:1}) for ascending order -1 for descending.
+
+    example --> db.products.find({price:{$gt:1000}}).sort({price:1})
+
+
+13. Logical Operator
+
+($and , $or, $not, $ne )
+
+--> I. $and --> syntax --> db.collectionName.find({$and:[{condition1},{condition2}]})
+
+Example --> find the product with price greater than 100 and name is "Diamond Ring" --> query --> db.products.find({$and:[{price:{$gt:100}},{'name':'Diamond Ring'}]})
+
+
+--> II. $or --> syntax --> db.collectionName.find({$or:[{condition1},{condition2}]}) 
+ 
+Example --> find the product with price greater than 2000 or name is Diamond Ring.--> db.products.find({$or:[{price:{$gt:2000}},{'name':'Diamond Ring'}]})
+
+
+14. Complex Expressions
+
+The $expr operator allows using aggregation expressions within a query.
+
+Usefull when you need to compare fields from the same documents in a more complex manner.
+
+syntax --> {$exp : {operator: [field, value]}}
+
+
+15. Element Operator ( $exists, $type, $size )
+
+{field : {$exists: <boolean>}} --> ex- db.products.find({price: {$exists: false},price:{$gt:1900}})
+
+{field : {$type: "<bson-data-type>"}} --> ex- db.products.find({name: {$type: 'string'}}).count()
+
+{field: {$size: <array-length>}} --> ex- db.comments.find({'comments': {$size: 2}})
+
+
+
+16. Projection
+
+--> to include specific fields, use projection with a value of 1 for the fields you want.
+   
+    To executes fields, use projections with a value of 0 for the fields you wants to exclude.
+
+    You cannot include and exlude fields simultaneously in the same query projection.
+
+Example --> db.products.find({colors: {$size: 3}}, {colors: 1})
+
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9262"),
+    colors: [ '#000000', '#ffffff', '#ff0000' ]
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9263"),
+    colors: [ '#333333', '#cccccc', '#00ff00' ]
+  },
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9264"),
+    colors: [ '#000000', '#ff0000', '#00ff00' ]
+  }
+]
+
+
+17. Embedded Documents
+
+--> Query document inside embedded documents using dot notation.
+
+   db.collectionName.find({"parent.child": value})
+
+   Example --> find the views from metadata object under the document whose views greater than 1200.
+
+--> db.comments.find({'metadata.views': {$gt:1200}})
+
+[
+  {
+    _id: 4,
+    title: 'Advanced Queries in MongoDB',
+    content: 'Learn how to write complex queries...',
+    author: 'Michael Johnson',
+    comments: [
+      { user: 'Grace', text: 'Mind-blowing content!' },
+      { user: 'Henry', text: 'Impressive examples.' }
+    ],
+    metadata: { views: 1500, likes: 60 }
+  }
+]
+
+
+18. $all Vs $elemMatch
+
+--> The $all operator select the documents where the value of a field is an array that contains all the specified elements.
+
+syntax --> {<field>: {$all: [<value>, <value2> ...]}}
+
+Example --> db.comments.find({'comments.user': {$all:['Alice','Vinod']}})
+
+19. The $elemMatch operator matches documents that contain an array field and array field with at least one element that mataches all the specified query criteria.
+
+syntax --> {field: {$elemMatch:{query1, query2, ...}}} 
+
+Example --> db.comments.find({comments: {$elemMatch: {'user':'Alice', 'text':'Awesome article!'}}})
+
+[
+  {
+    _id: 7,
+    title: 'Introduction to MongoDB',
+    content: 'MongoDB is a popular NoSQL database...',
+    author: 'Pravin Bhosale',
+    comments: [
+      { user: 'Alice', text: 'Awesome article!' },
+      { user: 'Pravin', text: 'Thanks for sharing.' }
+    ],
+    metadata: { views: 1000, likes: 70 }
+  }
+]
+
+
+20. updateOne
+
+--> db.collectionName.updateOne({filter}, {$set: {field: newValue}})
+
+Examples --> db.products.updateOne({_id: ObjectId("64c23601e32f4a51b19b9262")}, {$set: {price: 45}})
+
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9262"),
+    name: 'Smartphone Model X',
+    company: '64c23350e32f4a51b19b9230',
+    price: 45,
+    colors: [ '#000000', '#ffffff', '#ff0000' ],
+    image: '/images/product-smartphone.png',
+    category: '64c2342de32f4a51b19b924e',
+    isFeatured: false,
+    existingField: 'price',
+    newField: 45
+  }
+]
+
+21. UpdateMany
+
+--> db.collectionName.updateMany({filter}, {$set: {field: newValue, field1: newValue}})
+
+Example --> db.products.updateMany({ _id: ObjectId("64c23601e32f4a51b19b9262")}, {$set: {name: 'Model X', price:60, isFeatured: true}})
+
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+shop> db.products.findOne({ _id: ObjectId("64c23601e32f4a51b19b9262")})
+{
+  _id: ObjectId("64c23601e32f4a51b19b9262"),
+  name: 'Model X',
+  company: '64c23350e32f4a51b19b9230',
+  price: 60,
+  colors: [ '#000000', '#ffffff', '#ff0000' ],
+  image: '/images/product-smartphone.png',
+  category: '64c2342de32f4a51b19b924e',
+  isFeatured: true
+}
+
+
+22. Removing and Remaining fields
+
+syntax --> db.collectionName.updateOne({filter}, {$unset: {fieldName: 1}}) --> removing the field.
+
+Example --> db.products.updateOne({ _id: ObjectId("64c23601e32f4a51b19b9265")}, {$unset: {isFeatured: 1}})
+{
+  acknowledged: true,
+  insertedId: null,
+  matchedCount: 1,
+  modifiedCount: 1,
+  upsertedCount: 0
+}
+
+shop> db.products.find({ _id: ObjectId("64c23601e32f4a51b19b9265")})
+[
+  {
+    _id: ObjectId("64c23601e32f4a51b19b9265"),
+    name: 'Kitchen Blender',
+    company: '64c23350e32f4a51b19b9233',
+    price: 89,
+    colors: [ '#ffffff', '#ff9900', '#990000' ],
+    image: '/images/product-blender.png',
+    category: '64c2342de32f4a51b19b924f'
+  }
+]
+
+--> Renaming the field
+
+syntax --> db.collectionName.updateOne({filter}, {$rename: {oldField: 'newField'})
+
+Example --> db.products.updateOne({_id: ObjectId("64c23601e32f4a51b19b9265")}, {$rename: {price:"newPrice"}})
+
+--> updateMany
+
+db.collectionName.updateMany({filter}, {$rename:{oldField: 'newField'}})
+
+Example --> db.products.updateMany({price: 123}, {$rename: {isFeatured:'isFeature'}})
+
+
+23. Updating arrays and Embedded Documents
+
+syntax--> db.collectionName.updateOne({filter}, {$push: {arrayField: 'newElement'}})
+
+Example--> db.comments.updateOne({_id: 2}, {$push: {comments: {user:'pravinBhosale',text:'Awesome!'}}}) this is for adding the new field in array
+
+pop --> syntax --> db.collectionName.updateOne({filter}, {$pop: {arrayField: boolen value}})
+
+Example--> db.comments.updateOne({_id: 2},{$pop: {comments:1}})
+
+
+--> update the field values
+
+db.collectionName.updateOne({filter}, {$set: {'arrayFild.$.text': 'updatedValue'}})
+
+Example--> db.comments.updateOne({ _id: 2, 'comments.user':'David'}, {$set: {'comments.$.text':'Awesome Pravin'}})
+
+
+24. Delete operations in MongoDB
+
+syntax --> db.collectionName.deleteOne({filter}) --> db.comments.deleteOne({_id: 3})
+
+db.collectionName.deleteMany({price: 55})
+
+
+25. What are the Indexes ?
+
+--> Indexes are specialized data structures that optimize data retrieval speed in mongodb.
+
+Indexes store a fraction of data in a more searchable format.
+
+They enable mongodb to locate data faster during quries.
+
+Indexes are separate from collections and multiple indexes can exist per collection.
+
+
+26. Benifits of Indexes.
+
+--> Faster quering : Indexes drastically accelarate data retrival, particularly for large collections.
+
+--> Efficient Sorting: Indexes facilities rapid sorting based on specific fields.
+
+--> Improved Aggregationn: Aggregation operation more efficient with optimized indexes.
+
+--> Indexing on multiple fields: Complex quries can be executed effieciently by utilizing multiple fields in indexes.
+
+27. explain()
+
+--> use explain() method to understand qury execution in detail.
+
+Example: db.products.find({name: 'Air Fryer'}).explain();
+
+db.products.find({name: 'Air Fryer'}).explain('executionStats'); --> use it to measure the time taken to execute a query.
+
+28. Managing Indexes.
+
+db.products.createIndex({field: 1}) --> 1 for storing in ascending order.
+
+db.products.createIndex({field: -1}) --> -1 for storing indexes in descending order.
+
+--> getIndexes() is used to get indexes
+
+Example - db.collectionName.getIndexes()
+
+--> drop Index 
+
+Example - db.collectionName.dropIndex({field: 1})
+
+or db.collectionName.dropIndex({"IndexName"})
+
+29. Aggregation in Mongodb
+
+--> Definition - Aggregation is the process of performing transformation on documents and combining them to produce computed results.
+
+I. $match 
+
+--> The $match stage is similar to the query used as the first argument in find(). It filters documents based on specified conditions.
+
+syntax--> {$match:{query}}
+
+db.products.aggregate([{$match:{company: '64c23350e32f4a51b19b9239'}}])
+
+II. $group
+
+--> The $group stage groups documents by specified fields and performs aggregate operations on grouped data 
+
+db.products.aggregate([
+ 
+  {
+    $group: {
+      company: "$company",
+      totalSum: { $sum: '$price' },
+    },
+  },
+]);
+
+III. $project
+
+--> The $project stage reshapes documents, includes or excludes fields, and performs operations on fields.
+
+Example: db.products.aggregate([
+
+  {
+    $project: {
+      price: 1,
+      discountPrice: { $multiply: ["$price", 0.8] },
+    },
+  },
+  
+]);
+
+Iv. $push
+
+--> The $push stage adds element to an array field within documents.
+
+{$push:expression}
+
+Example-->
+
+db.products.aggregate([
+    
+    {
+        $group:{
+            _id:"$price",
+            allColors:{$push:'$colors'}
+        }
+    }
+])
+
+v. $unwind
+
+--> The $unwind stage deconstructs an array field and produces multiple documents.
+
+Example:
+
+db.products.aggregate([
+
+    {$unwind:'$colors'},
+
+    {
+        $match:{
+            price:{$gt:1200}
+        }
+    },
+   
+])
+
+vI. $addToSet
+
+--> The $addToSet stage adds elements to an array field while preveting duplicates.
+
+Example:
+
+db.products.aggregate([
+
+    {
+        $group:{
+            _id:"$price",
+            allColors:{$addToSet:'$colors'}
+        }
+    }
+])
+
+before using the addToSet the result is by using the push
+
+ { _id: 1299, allColors: [ [ '#333333', '#cccccc', '#00ff00' ] ] },
+
+  { _id: 1999, allColors: [ [ '#000000', '#cc6600', '#663300' ] ] }
+
+Then after using the $addToSet the result
+
+{ _id: 1299, allColors: [ '#333333', '#cccccc', '#00ff00' ] },
+
+  { _id: 1999, allColors: [ '#000000', '#cc6600', '#663300' ] }
